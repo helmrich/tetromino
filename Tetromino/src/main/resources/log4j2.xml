@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration status="info">
+    <Properties>
+        <Property name="layout">%d [%t] %-5level %logger - %m%n</Property>
+    </Properties>
+  
+    <Appenders>
+
+        <File name="A1" fileName="A1.log" append="false">
+            <PatternLayout pattern="${layout}"/>
+        </File>
+  
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${layout}" />
+        </Console>     
+
+    </Appenders>
+    
+    <Loggers>
+
+        <Logger name="de.hdm_stuttgart.mi" level="info" additivity="false" >
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="A1" />
+        </Logger>
+    
+        <Root level="error">
+            <AppenderRef ref="Console" />
+        </Root>    
+
+    </Loggers>
+</Configuration>

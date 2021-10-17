@@ -1,0 +1,29 @@
+@startuml
+
+title Class Diagram KeyInput
+
+package input {
+
+	class KeyInput {
+		- scene : Scene
+		- isPressedByKey : HashMap<KeyCode, Boolean>
+		- scheduledTaskByKey : HashMap<KeyCode, Future<?>>
+		- threadByKey : HashMap<KeyCode, ScheduledExecutorService>
+		__
+		+ KeyInput(scene : Scene)
+		..
+		+ isKeyPressed(key : KeyCode) : void
+		..
+		+ addPressedEvent(key : KeyCode, pressedHandle : Runnable) : void
+		+ addReleasedEvent(key : KeyCode, releasedHandle : Runnable) : void
+		+ addPressedAndReleasedEvent(key : KeyCode, pressedHandle Runnable, releasedHandle : Runnable) : void
+		+ addRepeatedEvent(key : KeyCode, repeatedHandle : Runnable, initialDelay : long, period : long) : void
+	}
+	
+}
+
+javafx.scene.Scene -up-o KeyInput
+javafx.scene.input.KeyCode -up-o KeyInput
+exception.UnassignedKeyException .up.> KeyInput
+
+@enduml

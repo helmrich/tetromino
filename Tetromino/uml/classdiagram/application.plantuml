@@ -1,0 +1,22 @@
+@startuml
+
+title Class Diagram Application
+
+package Tetromino {
+
+	class Application {
+		{static} + main(args : String[]) : void
+		+ start(stage : Stage) : void
+	}
+
+	class Launcher {
+		{static} + main(args : String[]) : void
+	}
+
+	Launcher <.right. Application
+
+}
+
+Application -up-|> javafx.application.Application
+
+@enduml

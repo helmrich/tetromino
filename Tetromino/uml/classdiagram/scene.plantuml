@@ -1,0 +1,164 @@
+@startuml
+
+title __SCENE's Class Diagram__\n
+
+package scene {
+
+	class SceneFactory {
+		{static} + create(sceneType : SceneType, width : double, height : double) : SceneInterface
+	}
+
+	interface SceneInterface {
+		{abstract} + getScene() : Scene
+		{abstract} + getSceneType() : SceneType
+		{abstract} + draw() : void
+		{abstract} + addInput() : void
+
+	}
+
+	class SceneParent < T extends Parent > {
+		+ SceneParent(root : T, width : double, height : double)
+		..
+		+ getScene() : Scene
+		# addStylesheets(stylesheets : String[]) : void
+	}
+
+	enum SceneType {
+		GAME
+		HIGHSCORE_LIST
+		OPTION_MENU
+		START_MENU
+		__
+		{abstract} + getInstance(width : double, height : double) : SceneInterface
+	}
+
+	package scenes {
+
+		class GameScene {
+			- game : Game
+			- gamePane : GamePane
+			- pauseMenuPane : PauseMenuPane
+			- gameOverPane : GameOverPane
+			__
+			+ GameScene(width : double, height : double)
+			..
+			+ getSceneType() : SceneType
+			..
+			+ draw() : void
+			+ addInput() : void
+			..
+			+ addPauseMenuPane() : void
+			+ removePauseMenuPane() : void
+			+ addGameOverPane() : void
+		}
+
+		class HighscoreListScene {
+			- highscoreList : HighscoreList
+			__
+			+ HighscoreListScene(width : double, height : double)
+			..
+			+ getSceneType() : SceneType
+			..
+			+ draw() : void
+			+ addInput() : void
+		}
+
+		class OptionMenuScene {
+			+ OptionMenuScene(width : double, height : double)
+			..
+			+ getSceneType() : SceneType
+			..
+			+ draw() : void
+			+ addInput() : void
+		}
+
+		class StartMenuScene {
+			+ StartMenuScene(width : double, height : double)
+			..
+			+ getSceneType() : SceneType
+			..
+			+ draw() : void
+			+ addInput() : void
+		}
+
+		package gamescenepanes {
+
+			class GameOverPane {
+				- game : Game
+				- gamePane : GamePane
+				__
+				+ GameOverPane(game : Game, gamePane : GamePane)
+				..
+				+ draw() : void
+				..
+				- addStylesheets(stylesheets : String[]) : void
+			}
+
+			class GamePane {
+				- game : Game
+				- drawLoop : AnimationTimer
+				- blockSize : double
+				__
+				+ GamePane(game : Game)
+				..
+				+ draw() : void
+				..
+				- addStylesheets(stylesheets : String[]) : void
+				..
+				+ startDrawLoop() : void
+				+ stopDrawLoop() : void
+				..
+				- drawField(field : Field, pane : Pane) : void
+				- drawPlayFieldBlocks(playField : PlayField, pane : Pane) : void
+				- drawTetromino(tetromino : Tetromino, pane : Pane) : void
+			}
+
+			class PauseMenuPane {
+				- game : Game
+				- gameScene : GameScene
+				- gamePane : GamePane
+				__
+				+ PauseMenuPane(game : Game, gameScene : GameScene, gamePane : GamePane)
+				..
+				+ draw() : void
+				..
+				- addStylesheets(stylesheets : String[]) : void
+			}
+
+		}
+
+	}
+
+	SceneFactory .right.> SceneType
+	SceneFactory .down.> SceneInterface
+
+	GameScene .up.|> SceneInterface
+	HighscoreListScene .up.|> SceneInterface
+	OptionMenuScene .up.|> SceneInterface
+	StartMenuScene .up.|> SceneInterface
+
+	GameScene -up-|> SceneParent
+	HighscoreListScene -up-|> SceneParent
+	OptionMenuScene -up-|> SceneParent
+	StartMenuScene -up-|> SceneParent
+
+	GameScene -up-*  SceneType
+	HighscoreListScene -up-*  SceneType
+	OptionMenuScene -up-*  SceneType
+	StartMenuScene -up-*  SceneType
+
+	GameOverPane -up-* GameScene
+	GamePane -up-*  GameScene
+	PauseMenuPane -up-*  GameScene
+
+}
+
+SceneParent -up-|> javafx.scene.Scene
+
+game.Game --o GameScene
+
+game.Game --o GameOverPane
+game.Game --o GamePane
+game.Game --o PauseMenuPane
+
+@enduml

@@ -1,0 +1,75 @@
+@startuml
+
+title Class Diagram Field
+
+package field {
+
+	class Field {
+		# field : List<List<Color>>
+		# width : int
+		# height : int
+		__
+		+ Field()
+		..
+		+ getWidth() : int
+		+ getHeight() : int
+		+ getCell(col : int, row : int) : Color
+		+ setCell(col : int, row : int, color : Color) : void
+		+ getRow(row : int) : List<Color>
+		+ setRow(row : int, colorRow : List<Color>) : void
+
+	}
+
+
+
+	class HoldField {
+		- tetromino : Tetromino
+		- swappable : boolean
+		__
+		+ HoldField()
+		..
+		+ getTetromino() : Tetromino
+		+ isSwappable() : boolean
+		+ setSwappable(swappable : boolean) : void
+		+ swapTetromino(givenTetromino : Tetromino) : Tetromino
+	}
+
+	class PlayField {
+		- tetromino : Tetromino
+		- shadow : Tetromino
+		__
+		+ PlayField()
+		..
+		+ getTetromino() : Tetromino
+		+ spawnTetromino(tetromino : Tetromino) : void
+		+ getShadow() : Tetromino
+		- setShadow() : void
+		..
+		+ translateTetromino(direction : Direction) : boolean
+		+ rotateTetromino(rotation : Rotation) : boolean
+		- wallkick(rotation : Rotation) : boolean
+		- isTetrominoValid(tetromino : Tetromino) : boolean
+		+ transferTetromino() : boolean
+		+ clearFullLines() : int
+	}
+
+	class NextField {
+		- tetrominos : List<Tetromino>
+		__
+		+ NextField()
+		..
+		+ getTetrominos() : List<Tetromino>
+		+ getNextTetromino() : Tetromino
+		..
+		- pushTetromino() : void
+		- shiftTetromino() : void
+		- setTetrominosPosition() : void
+	}
+
+	PlayField -up-|> Field
+	HoldField -up-|> Field
+	NextField -up-|> Field
+
+}
+
+@enduml

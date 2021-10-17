@@ -1,0 +1,32 @@
+@startuml
+
+title __BUTTONS's Class Diagram__\n
+
+package buttons {
+
+	class ActionButton {
+		+ ActionButton(label : String, onAction : Runnable)
+		# ActionButton(label : String)
+	}
+
+	class BackButton {
+		+ BackButton(sceneType : SceneType)
+	}
+
+	class ExitButton {
+		+ ExitButton()
+	}
+
+	class LinkButton {
+		+ LinkButton(label : String, sceneType : SceneType)
+	}
+
+	BackButton -up-|> LinkButton
+	ExitButton -up-|> ActionButton
+	LinkButton -up-|> ActionButton
+
+}
+
+ActionButton -up-|> javafx.scene.control.Button
+
+@enduml

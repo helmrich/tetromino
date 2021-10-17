@@ -1,0 +1,649 @@
+@startuml
+
+title Class Diagram Tetromino
+
+package Tetromino {
+
+    package game {
+
+        class Game {
+            - holdField : HoldField
+            - playField : PlayField
+            - nextField : NextField
+            - score : Score
+            ..
+            - gameOver : boolean
+            - isSoftDrop : boolean
+            ..
+            - period : int
+            - speedPeriod : int
+            ..
+            - gameLoop : ScheduledExecutorService
+            - gameLoopTask : Future<?>
+            __
+            + Game()
+            ..
+            + getHoldField() : HoldField
+            + getPlayField() : PlayField
+            + getNextField() : NextField
+            + getScore() : Score
+            + isGameLoopRunning() : boolean
+            + isGameOver() : boolean
+            + getPeriod() : int
+            ..
+            + startGameLoop() : void
+            + stopGameLoop() : void
+            ..
+            + translateTetrominoIfPossible() : void
+            + rotateTetrominoIfPossible() : void
+            + startSoftDrop() : void
+            + stopSoftDrop() : void
+            + hardDrop() : void
+            + swapTetrominoIfPossible() : void
+        }
+
+        package field {
+
+            class Field {
+                # field : List<List<Color>>
+                # width : int
+                # height : int
+                __
+                + Field()
+                ..
+                + getWidth() : int
+                + getHeight() : int
+                + getCell(col : int, row : int) : Color
+                + setCell(col : int, row : int, color : Color) : void
+                + getRow(row : int) : List<Color>
+                + setRow(row : int, colorRow : List<Color>) : void
+
+            }
+
+            class HoldField {
+                - tetromino : Tetromino
+                - swappable : boolean
+                __
+                + HoldField()
+                ..
+                + getTetromino() : Tetromino
+                + isSwappable() : boolean
+                + setSwappable(swappable : boolean) : void
+                + swapTetromino(givenTetromino : Tetromino) : Tetromino
+            }
+
+            class PlayField {
+                - tetromino : Tetromino
+                - shadow : Tetromino
+                __
+                + PlayField()
+                ..
+                + getTetromino() : Tetromino
+                + spawnTetromino(tetromino : Tetromino) : void
+                + getShadow() : Tetromino
+                - setShadow() : void
+                ..
+                + translateTetromino(direction : Direction) : boolean
+                + rotateTetromino(rotation : Rotation) : boolean
+                - wallkick(rotation : Rotation) : boolean
+                - isTetrominoValid(tetromino : Tetromino) : boolean
+                + transferTetromino() : boolean
+                + clearFullLines() : int
+            }
+
+            class NextField {
+                - tetrominos : List<Tetromino>
+                __
+                + NextField()
+                ..
+                + getTetrominos() : List<Tetromino>
+                + getNextTetromino() : Tetromino
+                ..
+                - pushTetromino() : void
+                - shiftTetromino() : void
+                - setTetrominosPosition() : void
+            }
+
+            HoldField -up-|> Field
+            PlayField -up-|> Field
+            NextField -up-|> Field
+
+            PlayField -right[hidden]- NextField
+            PlayField -left[hidden]- HoldField
+            NextField -right[hidden]- score
+            Field -right[hidden]- Game
+
+        }
+
+        package tetromino {
+
+            enum Color {
+                CYAN
+                BLUE
+                ORANGE
+                YELLOW
+                GREEN
+                PURPLE
+                RED
+                SHADOW
+            }
+
+            enum Rotation {
+                CLOCKWISE
+                COUNTERCLOCKWISE
+            }
+
+
+            enum Direction {
+                DOWN
+                LEFT
+                RIGHT
+                UP
+                ..
+                - directionVector : Vector2D
+                ..
+                {static} - directions : Direction[]
+                {static} - length : int
+                __
+                + getDirectionVector() : Vector2D
+                ..
+                + next() : Direction
+                + previous() : Direction
+            }
+
+            interface EnumMapProducer < K extends Enum<K>, V > <<Functional Interface>> {
+                {abstract} + getEnumMap() : EnumMap<K, V>
+            }
+
+            enum Shape {
+                I
+                J
+                L
+                O
+                S
+                T
+                Z
+                ..
+                - shapeByDirection : EnumMap<Direction, List<List<Integer>>>
+                - center : Vector2D
+                ..
+                {static} - shapes : Shape[]
+                {static} - length : int
+                {static} - random : Random
+                {static} - lastRandom : Shape
+                __
+                - Shape(enumMapProducer : EnumMapProducer<Direction, List<List<Integer>>>)
+                {static} + random() : Shape
+                ..
+                + getCenter() : Vector2D
+                + getShapeForDirection(direction : Direction) : List<List<Integer>>
+            }
+
+            class Vector2D {
+                - x : double
+                - y : double
+                __
+                + Vector2D()
+                + copy() : Vector2D
+                ..
+                + getX() : double
+                + setX(x : double) : void
+                + getY() : double
+                + setY(y : double) : void
+                ..
+                + toString() : String
+                + equals(obj : Object) : boolean
+                + hashCode() : int
+                ..
+                + add(vector2D : Vector2D) : Vector2D
+                + subtract(vector2D : Vector2D) : Vector2D
+            }
+
+            class Tetromino {
+                - shape : Shape
+                - color : Color
+                - direction : Direction
+                - position : Vector2D
+                __
+                + Tetromino(shape : Shape)
+                - Tetromino(shape : Shape, color : Color, direction : Direction, position : Vector2D)
+                + copy() : Tetromino
+                ..
+                + getShape() : Shape
+                + setShape(shape : Shape) : void
+                + getColor() : Color
+                + setColor( color : Color) : void
+                + getDirection() : Direction
+                + setDirection(direction : Direction) : void
+                + getPosition() : Vector2D
+                + setPosition(position : Vector2D) : void
+                + setDefault() : void
+                + setDefaultColor() : void
+                + getTopLeftCornerPosition() : Vector2D
+                + getColorForShape(shape : Shape) : Color
+                + getShapeForCurrentRotation() : List<List<Integer>>
+                ..
+                + translate(direction : Direction) : void
+                + rotate(rotation : Rotation) : void
+            }
+
+            Tetromino o-down- Direction
+            Tetromino o-down- Vector2D
+            Tetromino *-down- Shape
+
+            Vector2D o-left- Shape
+            Vector2D o-left- Direction
+
+            Color -right-o Tetromino
+            Rotation -left-> Tetromino
+            EnumMapProducer -up-+  Shape
+
+        }
+
+        package score {
+
+            class HighscoreList {
+                - highscores : List<Score>
+                __
+                + getHighscores() : List<Score>
+                + addScore(score : Score) : void
+                ..
+                + limitHighscoreList() : void
+            }
+
+            class Score {
+                - name : String
+                - points : long
+                __
+                + Score()
+                + Score(name : String, points : long)
+                + copy() : Score
+                ..
+                + getName() : String
+                + setName(name : String) : void
+                + getPoints() : long
+                + setPoints(points : long)
+                ..
+                + increase(scoreType : ScoreType) : void
+                + increase(scoreType : ScoreType, multiplier : double) : void
+                + lineIncrease(numberOfClearedLines : int) : void
+            }
+
+            enum ScoreType {
+                DOUBLE
+                HARD_DROP
+                SINGLE
+                SOFT_DROP
+                TETRIS
+                TRIPLE
+                ..
+                - points
+                __
+                - ScoreType(points : int)
+                ..
+                + getPoints() : int
+            }
+
+            Score -down-o HighscoreList
+            ScoreType .left.> Score
+
+        }
+
+
+        Tetromino -up-o NextField
+        Tetromino -up-o PlayField
+
+        Tetromino -up-o HoldField
+
+        Color -up-o Field
+        Color -up-o HoldField
+        Color -up-o PlayField
+        Color -up-o NextField
+
+
+        HoldField -up-o Game
+        PlayField -up-o Game
+        NextField -up-o Game
+
+
+        Score -up-o Game
+
+    }
+
+    package datamanager {
+
+        interface DataManager < T > {
+            {abstract} + loadData() : T
+            {abstract} + saveData(data : T) : void
+        }
+
+        class DataManagerFactory {
+            {static} + createGameSpeedManager(type : String) : GameSpeedManager
+            {static} + createHighscoreListManager(type : String) : HighscoreListManager
+        }
+
+        interface GameSpeedManager < Integer > {
+        }
+
+        interface HighscoreListManager < HighscoreList > {
+        }
+
+        package datamanagers {
+
+            class GameSpeedUserPreferencesManager {
+                + loadData() : Integer
+                + saveData(data : Integer) : void
+            }
+
+            class HighscoreListUserPreferencesManager {
+                + loadData() : HighscoreList
+                + saveData(data : HighscoreList) : void
+            }
+
+        }
+
+        GameSpeedManager -up-|> DataManager
+        HighscoreListManager -up-|> DataManager
+        GameSpeedManager <.up. DataManagerFactory
+        HighscoreListManager <.up. DataManagerFactory
+
+        GameSpeedUserPreferencesManager .up.|> GameSpeedManager
+        HighscoreListUserPreferencesManager .up.|> HighscoreListManager
+
+    }
+
+    package exception {
+
+        class UnassignedKeyException <<(E,red)>>
+
+        class InvalidNumberOfClearedLinesException <<(E,red)>>
+
+        hide UnassignedKeyException members
+        hide InvalidNumberOfClearedLinesException members
+
+        UnassignedKeyException -left[hidden]- InvalidNumberOfClearedLinesException
+
+    }
+
+    package gui {
+
+        package scene {
+
+            class SceneFactory {
+                {static} + create(sceneType : SceneType, width : double, height : double) : SceneInterface
+            }
+
+            interface SceneInterface {
+                {abstract} + getScene() : Scene
+                {abstract} + getSceneType() : SceneType
+                {abstract} + draw() : void
+                {abstract} + addInput() : void
+
+            }
+
+            class SceneParent < T extends Parent > {
+                + SceneParent(root : T, width : double, height : double)
+                ..
+                + getScene() : Scene
+                # addStylesheets(stylesheets : String[]) : void
+            }
+
+            enum SceneType {
+                GAME
+                HIGHSCORE_LIST
+                OPTION_MENU
+                START_MENU
+                __
+                {abstract} + getInstance(width : double, height : double) : SceneInterface
+            }
+
+            package scenes {
+
+                class HighscoreListScene {
+                    - highscoreList : HighscoreList
+                    __
+                    + HighscoreListScene(width : double, height : double)
+                    ..
+                    + getSceneType() : SceneType
+                    ..
+                    + draw() : void
+                    + addInput() : void
+                }
+
+                class OptionMenuScene {
+                    + OptionMenuScene(width : double, height : double)
+                    ..
+                    + getSceneType() : SceneType
+                    ..
+                    + draw() : void
+                    + addInput() : void
+                }
+
+                class StartMenuScene {
+                    + StartMenuScene(width : double, height : double)
+                    ..
+                    + getSceneType() : SceneType
+                    ..
+                    + draw() : void
+                    + addInput() : void
+                }
+
+                class GameScene {
+                    - game : Game
+                    - gamePane : GamePane
+                    - pauseMenuPane : PauseMenuPane
+                    - gameOverPane : GameOverPane
+                    __
+                    + GameScene(width : double, height : double)
+                    ..
+                    + getSceneType() : SceneType
+                    ..
+                    + draw() : void
+                    + addInput() : void
+                    ..
+                    + addPauseMenuPane() : void
+                    + removePauseMenuPane() : void
+                    + addGameOverPane() : void
+                }
+
+                package gamescenepanes {
+
+                    class GameOverPane {
+                        - game : Game
+                        - gamePane : GamePane
+                        __
+                        + GameOverPane(game : Game, gamePane : GamePane)
+                        ..
+                        + draw() : void
+                        ..
+                        - addStylesheets(stylesheets : String[]) : void
+                    }
+
+                    class GamePane {
+                        - game : Game
+                        - drawLoop : AnimationTimer
+                        - blockSize : double
+                        __
+                        + GamePane(game : Game)
+                        ..
+                        + draw() : void
+                        ..
+                        - addStylesheets(stylesheets : String[]) : void
+                        ..
+                        + startDrawLoop() : void
+                        + stopDrawLoop() : void
+                        ..
+                        - drawField(field : Field, pane : Pane) : void
+                        - drawPlayFieldBlocks(playField : PlayField, pane : Pane) : void
+                        - drawTetromino(tetromino : Tetromino, pane : Pane) : void
+                    }
+
+                    class PauseMenuPane {
+                        - game : Game
+                        - gameScene : GameScene
+                        - gamePane : GamePane
+                        __
+                        + PauseMenuPane(game : Game, gameScene : GameScene, gamePane : GamePane)
+                        ..
+                        + draw() : void
+                        ..
+                        - addStylesheets(stylesheets : String[]) : void
+                    }
+
+                }
+
+            }
+
+            SceneFactory .right.> SceneType
+            SceneFactory .down.> SceneInterface
+
+
+            HighscoreListScene .up.|> SceneInterface
+            OptionMenuScene .up.|> SceneInterface
+            StartMenuScene .up.|> SceneInterface
+            GameScene .up.|> SceneInterface
+
+
+            HighscoreListScene -up-|> SceneParent
+            OptionMenuScene -up-|> SceneParent
+            StartMenuScene -up-|> SceneParent
+            GameScene -up-|> SceneParent
+
+
+            HighscoreListScene -up-*  SceneType
+            OptionMenuScene -up-*  SceneType
+            StartMenuScene -up-*  SceneType
+            GameScene -up-*  SceneType
+
+            GameOverPane -up-* GameScene
+            GamePane -up-*  GameScene
+            PauseMenuPane -up-*  GameScene
+
+
+            OptionMenuScene -left[hidden]- StartMenuScene
+            OptionMenuScene -left[hidden]- OptionMenuScene
+            GameScene -left[hidden]- HighscoreListScene
+
+        }
+
+        package buttons {
+
+            class ActionButton {
+                + ActionButton(label : String, onAction : Runnable)
+                # ActionButton(label : String)
+            }
+
+            class BackButton {
+                + BackButton(sceneType : SceneType)
+            }
+
+            class ExitButton {
+                + ExitButton()
+            }
+
+            class LinkButton {
+                + LinkButton(label : String, sceneType : SceneType)
+            }
+
+            BackButton -up-|> LinkButton
+            ExitButton -up-|> ActionButton
+            LinkButton -up-|> ActionButton
+
+        }
+
+    }
+
+    package input {
+
+        class KeyInput {
+            - scene : Scene
+            - isPressedByKey : HashMap<KeyCode, Boolean>
+            - scheduledTaskByKey : HashMap<KeyCode, Future<?>>
+            - threadByKey : HashMap<KeyCode, ScheduledExecutorService>
+            __
+            + KeyInput(scene : Scene)
+            ..
+            + isKeyPressed(key : KeyCode) : void
+            ..
+            + addPressedEvent(key : KeyCode, pressedHandle : Runnable) : void
+            + addReleasedEvent(key : KeyCode, releasedHandle : Runnable) : void
+            + addPressedAndReleasedEvent(key : KeyCode, pressedHandle Runnable, releasedHandle : Runnable) : void
+            + addRepeatedEvent(key : KeyCode, repeatedHandle : Runnable, initialDelay : long, period : long) : void
+        }
+
+    }
+
+    class Application {
+        {static} + main(args : String[]) : void
+        + start(stage : Stage) : void
+    }
+
+    class Launcher {
+        {static} + main(args : String[]) : void
+    }
+
+    Launcher <.left. Application
+
+
+
+
+
+    Game -up-o GameScene
+    Game -up-o GameOverPane
+    Game -up-o GamePane
+    Game -up-o PauseMenuPane
+
+    input -up-> GameScene
+
+
+    InvalidNumberOfClearedLinesException ..> Score
+    UnassignedKeyException .up.> KeyInput
+
+    HighscoreList <-- HighscoreListManager
+    Game <-- GameSpeedManager
+
+
+    Application <-- StartMenuScene
+
+
+    Application -[hidden]- gui
+
+    input -[hidden]- gui
+    gui -[hidden]- input
+
+    exception -left[hidden]- game
+    exception -down[hidden]- datamanager
+
+
+
+}
+
+namespace javafx {
+
+    namespace application {
+
+        class javafx.application.Application
+
+    }
+
+    namespace scene {
+
+        class javafx.scene.Scene
+
+        namespace control {
+
+            class javafx.scene.control.Button
+
+        }
+
+    }
+
+}
+
+Application -up-|> javafx.application.Application
+SceneParent -up-|> javafx.scene.Scene
+ActionButton -up-|> javafx.scene.control.Button
+
+
+
+@enduml

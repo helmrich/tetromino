@@ -1,0 +1,306 @@
+@startuml
+
+title Class Diagram Game
+
+package game {
+
+	class Game {
+		- holdField : HoldField
+		- playField : PlayField
+		- nextField : NextField
+		- score : Score
+		..
+		- gameOver : boolean
+		- isSoftDrop : boolean
+		..
+		- period : int
+		- speedPeriod : int
+		..
+		- gameLoop : ScheduledExecutorService
+		- gameLoopTask : Future<?>
+		__
+		+ Game()
+		..
+		+ getHoldField() : HoldField
+		+ getPlayField() : PlayField
+		+ getNextField() : NextField
+		+ getScore() : Score
+		+ isGameLoopRunning() : boolean
+		+ isGameOver() : boolean
+		+ getPeriod() : int
+		..
+		+ startGameLoop() : void
+		+ stopGameLoop() : void
+		..
+		+ translateTetrominoIfPossible() : void
+		+ rotateTetrominoIfPossible() : void
+		+ startSoftDrop() : void
+		+ stopSoftDrop() : void
+		+ hardDrop() : void
+		+ swapTetrominoIfPossible() : void
+	}
+
+	package field {
+
+		class Field {
+			# field : List<List<Color>>
+			# width : int
+			# height : int
+			__
+			+ Field()
+			..
+			+ getWidth() : int
+			+ getHeight() : int
+			+ getCell(col : int, row : int) : Color
+			+ setCell(col : int, row : int, color : Color) : void
+			+ getRow(row : int) : List<Color>
+			+ setRow(row : int, colorRow : List<Color>) : void
+
+		}
+
+		class HoldField {
+			- tetromino : Tetromino
+			- swappable : boolean
+			{static} - shadowColor : Color
+			__
+			+ HoldField()
+			..
+			+ getTetromino() : Tetromino
+			+ isSwappable() : boolean
+			+ setSwappable(swappable : boolean) : void
+			+ swapTetromino(givenTetromino : Tetromino) : Tetromino
+		}
+
+		class PlayField {
+			- tetromino : Tetromino
+			- shadow : Tetromino
+			{static} - shadowColor : Color
+			__
+			+ PlayField()
+			..
+			+ getTetromino() : Tetromino
+			+ spawnTetromino(tetromino : Tetromino) : void
+			+ getShadow() : Tetromino
+			- setShadow() : void
+			..
+			+ translateTetromino(direction : Direction) : boolean
+			+ rotateTetromino(rotation : Rotation) : boolean
+			- wallkick(rotation : Rotation) : boolean
+			- isTetrominoValid(tetromino : Tetromino) : boolean
+			+ transferTetromino() : boolean
+			+ clearFullLines() : int
+		}
+
+		class NextField {
+			- tetrominos : List<Tetromino>
+			__
+			+ NextField()
+			..
+			+ getTetrominos() : List<Tetromino>
+			+ getNextTetromino() : Tetromino
+			..
+			- pushTetromino() : void
+			- shiftTetromino() : void
+			- setTetrominosPosition() : void
+		}
+
+		PlayField -up-|> Field
+		HoldField -up-|> Field
+		NextField -up-|> Field
+
+	}
+
+	package tetromino {
+
+		enum Color {
+			CYAN
+			BLUE
+			ORANGE
+			YELLOW
+			GREEN
+			PURPLE
+			RED
+			SHADOW
+		}
+
+		enum Direction {
+			DOWN
+			LEFT
+			RIGHT
+			UP
+			..
+			- directionVector : Vector2D
+			..
+			{static} - directions : Direction[]
+			{static} - length : int
+			__
+			+ getDirectionVector() : Vector2D
+			..
+			+ next() : Direction
+			+ previous() : Direction
+		}
+
+		enum Rotation {
+			CLOCKWISE
+			COUNTERCLOCKWISE
+		}
+
+		interface EnumMapProducer < K extends Enum<K>, V > <<Functional Interface>> {
+			{abstract} + getEnumMap() : EnumMap<K, V>
+		}
+
+		enum Shape {
+			I
+			J
+			L
+			O
+			S
+			T
+			Z
+			..
+			- shapeByDirection : EnumMap<Direction, List<List<Integer>>>
+			- center : Vector2D
+			..
+			{static} - shapes : Shape[]
+			{static} - length : int
+			{static} - random : Random
+			{static} - lastRandom : Shape
+			__
+			- Shape(enumMapProducer : EnumMapProducer<Direction, List<List<Integer>>>)
+			{static} + random() : Shape
+			..
+			+ getCenter() : Vector2D
+			+ getShapeForDirection(direction : Direction) : List<List<Integer>>
+		}
+
+		class Tetromino {
+			- shape : Shape
+			- color : Color
+			- direction : Direction
+			- position : Vector2D
+			__
+			+ Tetromino(shape : Shape)
+			- Tetromino(shape : Shape, color : Color, direction : Direction, position : Vector2D)
+			+ copy() : Tetromino
+			..
+			+ getShape() : Shape
+			+ setShape(shape : Shape) : void
+			+ getColor() : Color
+			+ setColor( color : Color) : void
+			+ getDirection() : Direction
+			+ setDirection(direction : Direction) : void
+			+ getPosition() : Vector2D
+			+ setPosition(position : Vector2D) : void
+			+ setDefault() : void
+			+ setDefaultColor() : void
+			+ getTopLeftCornerPosition() : Vector2D
+			+ getColorForShape(shape : Shape) : Color
+			+ getShapeForCurrentRotation() : List<List<Integer>>
+			..
+			+ translate(direction : Direction) : void
+			+ rotate(rotation : Rotation) : void
+		}
+
+		class Vector2D {
+			- x : double
+			- y : double
+			__
+			+ Vector2D()
+			+ copy() : Vector2D
+			..
+			+ getX() : double
+			+ setX(x : double) : void
+			+ getY() : double
+			+ setY(y : double) : void
+			..
+			+ toString() : String
+			+ equals(obj : Object) : boolean
+			+ hashCode() : int
+			..
+			+ add(vector2D : Vector2D) : Vector2D
+			+ subtract(vector2D : Vector2D) : Vector2D
+		}
+
+		Direction o-left- Vector2D
+		Shape o-right- Vector2D
+		Tetromino o-down- Direction
+		Tetromino o-down- Vector2D
+		Tetromino *-down- Shape
+		Color -right-o Tetromino
+		Rotation -left-> Tetromino
+		EnumMapProducer -up-+  Shape
+
+	}
+
+	package score {
+
+		class HighscoreList {
+			- highscores : List<Score>
+			__
+			+ getHighscores() : List<Score>
+			+ addScore(score : Score) : void
+			..
+			+ limitHighscoreList() : void
+		}
+
+		class Score {
+			- name : String
+			- points : long
+			__
+			+ Score()
+			+ Score(name : String, points : long)
+			+ copy() : Score
+			..
+			+ getName() : String
+			+ setName(name : String) : void
+			+ getPoints() : long
+			+ setPoints(points : long)
+			..
+			+ increase(scoreType : ScoreType) : void
+			+ increase(scoreType : ScoreType, multiplier : double) : void
+			+ lineIncrease(numberOfClearedLines : int) : void
+		}
+
+		enum ScoreType {
+			DOUBLE
+			HARD_DROP
+			SINGLE
+			SOFT_DROP
+			TETRIS
+			TRIPLE
+			..
+			- points
+			__
+			- ScoreType(points : int)
+			..
+			+ getPoints() : int
+		}
+
+		Score -down-o HighscoreList
+		ScoreType .left.> Score
+
+	}
+
+	Tetromino -up-o HoldField
+	Tetromino -up-o NextField
+	Tetromino -up-o PlayField
+
+	Color -up-o Field
+	Color -up-o HoldField
+	Color -up-o NextField
+	Color -up-o PlayField
+
+	NextField -up-o Game
+	PlayField -up-o Game
+	HoldField -up-o Game
+	Score -up-o Game
+
+
+
+
+	exception.InvalidNumberOfClearedLinesException ..> Score
+
+}
+
+
+@enduml

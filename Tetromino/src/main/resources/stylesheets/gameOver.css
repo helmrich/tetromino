@@ -1,0 +1,27 @@
+.container {
+    -fx-font-family: 'AsepriteFont';
+}
+
+.game-over-heading {
+    -fx-font-size: 100px;
+    -fx-text-fill: #eeeeee;
+}
+
+.game-over-label {
+    -fx-font-size: 40px;
+    -fx-text-fill: #eeeeee;
+    -fx-padding: 10px;
+    -fx-pref-width: 175px;
+}
+
+.game-over-value-label {
+    -fx-font-size: 40px;
+    -fx-text-fill: #eeeeee;
+    -fx-pref-width: 375px;
+}
+
+.name-input {
+    -fx-font-size: 30px;
+    -fx-pref-width: 375px;
+    -fx-background-color: #eeeeee;
+}

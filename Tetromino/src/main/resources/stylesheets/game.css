@@ -1,0 +1,70 @@
+/* Root Node */
+
+#root {
+    -fx-background-color: #222831;
+}
+
+
+/* Fields */
+
+#holdfield {
+    /* -fx-background-color: #393e46; */
+    -fx-background-color: #eeeeee;
+}
+
+#nextfield {
+    /* -fx-background-color: #393e46; */
+    -fx-background-color: #eeeeee;
+}
+
+#playfield {
+    /* -fx-background-color: #393e46; */
+    -fx-background-color: #eeeeee;
+}
+
+#spacer {
+    -fx-fill: #222831;
+}
+
+/* Tetromino Colors */
+
+.cyan {
+    -fx-fill: rgb(88, 176, 188);
+}
+
+.blue {
+    -fx-fill: rgb(20, 101, 166);
+}
+
+.orange {
+    -fx-fill: rgb(219, 132, 0);
+}
+
+.yellow {
+    -fx-fill: rgb(234, 213, 0);
+}
+
+.green {
+    -fx-fill: rgb(55, 154, 48);
+}
+
+.purple {
+    -fx-fill: rgb(137, 64, 135);
+}
+
+.red {
+    -fx-fill: rgb(204, 11, 16);
+}
+
+.shadow {
+    -fx-fill: rgba(0, 0, 0, 0.25);
+}
+
+
+/* Score-related Labels */
+
+.score-label {
+    -fx-font-family: 'AsepriteFont';
+    -fx-text-fill: #eeeeee;
+    -fx-font-size: 40px;
+}

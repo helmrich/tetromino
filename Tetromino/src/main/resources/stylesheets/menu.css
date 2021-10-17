@@ -1,0 +1,67 @@
+/* General */
+
+.button {
+    -fx-font-family: 'AsepriteFont';
+    -fx-text-alignment: center;
+    -fx-background-color: none;
+    -fx-text-fill: #eeeeee;
+    -fx-border-color: #eeeeee;
+    -fx-border-width: 2;
+}
+
+.button:focused {
+    -fx-text-fill: #222831;
+    -fx-background-color: #eeeeee;
+}
+
+.button:hover {
+    -fx-text-fill: #222831;
+    -fx-background-color: #eeeeee;
+}
+
+.label {
+    -fx-font-size: 40px;
+    -fx-text-fill: #eeeeee;
+}
+
+/* Menu */
+
+.menu {
+    -fx-background-color: #222831;
+    -fx-font-family: 'AsepriteFont';
+}
+
+.menu-button {
+    -fx-pref-height: 40px;
+    -fx-pref-width: 150px;
+    -fx-font-size: 25px;
+}
+
+.back-button {
+    -fx-pref-height: 30px;
+    -fx-pref-width: 100px;
+    -fx-font-size: 22.5px;
+}
+
+.reset-button {
+    -fx-pref-width: 250px;
+}
+
+.menu-heading {
+    -fx-font-size: 80px;
+    -fx-text-alignment: center;
+    -fx-text-fill: #eeeeee;
+}
+
+.game-title-heading {
+    -fx-font-size: 110px;
+}
+
+.subtitle {
+    -fx-font-size: 25px;
+    -fx-line-spacing: -7.5px;
+}
+
+.game-speed-indicator-label {
+    -fx-pref-width: 110px;
+}

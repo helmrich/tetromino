@@ -1,0 +1,135 @@
+@startuml
+
+title Class Diagram Tetromino
+
+package tetromino {
+
+	enum Color {
+		CYAN
+		BLUE
+		ORANGE
+		YELLOW
+		GREEN
+		PURPLE
+		RED
+		SHADOW
+	}
+
+	enum Direction {
+		DOWN
+		LEFT
+		RIGHT
+		UP
+		..
+		- directionVector : Vector2D
+		..
+		{static} - directions : Direction[]
+		{static} - length : int
+		__
+		+ getDirectionVector() : Vector2D
+		..
+		+ next() : Direction
+		+ previous() : Direction
+	}
+
+	enum Rotation {
+		CLOCKWISE
+		COUNTERCLOCKWISE
+	}
+
+	interface EnumMapProducer < K extends Enum<K>, V > <<Functional Interface>> {
+		{abstract} + getEnumMap() : EnumMap<K, V>
+	}
+
+	enum Shape {
+		I
+		J
+		L
+		O
+		S
+		T
+		Z
+		..
+		- shapeByDirection : EnumMap<Direction, List<List<Integer>>>
+		- center : Vector2D
+		..
+		{static} - shapes : Shape[]
+		{static} - length : int
+		{static} - random : Random
+		{static} - lastRandom : Shape
+		__
+		- Shape(enumMapProducer : EnumMapProducer<Direction, List<List<Integer>>>)
+		{static} + random() : Shape
+		..
+		+ getCenter() : Vector2D
+		+ getShapeForDirection(direction : Direction) : List<List<Integer>>
+	}
+
+	class Tetromino {
+		- shape : Shape
+		- color : Color
+		- direction : Direction
+		- position : Vector2D
+		__
+		+ Tetromino(shape : Shape)
+		- Tetromino(shape : Shape, color : Color, direction : Direction, position : Vector2D)
+		+ copy() : Tetromino
+		..
+		+ getShape() : Shape
+		+ setShape(shape : Shape) : void
+		+ getColor() : Color
+		+ setColor( color : Color) : void
+		+ getDirection() : Direction
+		+ setDirection(direction : Direction) : void
+		+ getPosition() : Vector2D
+		+ setPosition(position : Vector2D) : void
+		+ setDefault() : void
+		+ setDefaultColor() : void
+		+ getTopLeftCornerPosition() : Vector2D
+		+ getColorForShape(shape : Shape) : Color
+		+ getShapeForCurrentRotation() : List<List<Integer>>
+		..
+		+ translate(direction : Direction) : void
+		+ rotate(rotation : Rotation) : void
+	}
+
+	class Vector2D {
+		- x : double
+		- y : double
+		__
+		+ Vector2D()
+		+ copy() : Vector2D
+		..
+		+ getX() : double
+		+ setX(x : double) : void
+		+ getY() : double
+		+ setY(y : double) : void
+		..
+		+ toString() : String
+		+ equals(obj : Object) : boolean
+		+ hashCode() : int
+		..
+		+ add(vector2D : Vector2D) : Vector2D
+		+ subtract(vector2D : Vector2D) : Vector2D
+	}
+
+	' skinparam ranksep 50
+	' skinparam nodesep 50
+
+	
+
+	Vector2D -left-o Shape
+	Vector2D -right-o Direction
+	Direction -up-o Tetromino
+	Vector2D -up-o Tetromino
+	Shape -up-* Tetromino
+	Color -right-o Tetromino
+	Rotation -left-> Tetromino
+	EnumMapProducer -up-+  Shape
+	
+	Direction -up-> Tetromino
+	Direction -[norank]-> Shape
+	
+}
+
+@enduml

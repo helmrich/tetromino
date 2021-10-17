@@ -1,0 +1,47 @@
+@startuml
+
+title Class Diagram Datamanager
+
+package datamanager {
+
+	interface DataManager < T > {
+		{abstract} + loadData() : T
+		{abstract} + saveData(data : T) : void
+	}
+
+	class DataManagerFactory {
+		{static} + createGameSpeedManager(type : String) : GameSpeedManager
+		{static} + createHighscoreListManager(type : String) : HighscoreListManager
+	}
+
+	interface GameSpeedManager < Integer > {
+	}
+
+	interface HighscoreListManager < HighscoreList > {
+	}
+
+	package datamanagers {
+
+		class GameSpeedUserPreferencesManager {
+			+ loadData() : Integer
+			+ saveData(data : Integer) : void
+		}
+
+		class HighscoreListUserPreferencesManager {
+			+ loadData() : HighscoreList
+			+ saveData(data : HighscoreList) : void
+		}
+
+	}
+
+	GameSpeedManager -up-|> DataManager
+	HighscoreListManager -up-|> DataManager
+	GameSpeedManager <.up. DataManagerFactory
+	HighscoreListManager <.up. DataManagerFactory
+
+	GameSpeedUserPreferencesManager .up.|> GameSpeedManager
+	HighscoreListUserPreferencesManager .up.|> HighscoreListManager
+
+}
+
+@enduml

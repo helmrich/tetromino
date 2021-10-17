@@ -1,0 +1,56 @@
+@startuml
+
+title Class Diagram Highscore
+
+package score {
+
+	class HighscoreList {
+		- highscores : List<Score>
+		__
+		+ getHighscores() : List<Score>
+		+ addScore(score : Score) : void
+		..
+		+ limitHighscoreList() : void
+	}
+
+	class Score {
+		- name : String
+		- points : long
+		__
+		+ Score()
+		+ Score(name : String, points : long)
+		+ copy() : Score
+		..
+		+ getName() : String
+		+ setName(name : String) : void
+		+ getPoints() : long
+		+ setPoints(points : long)
+		..
+		+ increase(scoreType : ScoreType) : void
+		+ increase(scoreType : ScoreType, multiplier : double) : void
+		+ lineIncrease(numberOfClearedLines : int) : void
+	}
+
+	enum ScoreType {
+		DOUBLE
+		HARD_DROP
+		SINGLE
+		SOFT_DROP
+		TETRIS
+		TRIPLE
+		..
+		- points
+		__
+		- ScoreType(points : int)
+		..
+		+ getPoints() : int
+	}
+
+	Score -down-o HighscoreList
+	ScoreType .left.> Score
+
+}
+
+exception.InvalidNumberOfClearedLinesException ..> Score
+
+@enduml
