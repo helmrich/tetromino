@@ -1,5 +1,7 @@
 # Tetromino
 
+[Link to original project in university's GitLab](https://gitlab.mi.hdm-stuttgart.de/jh257/tetromino)
+
 ![Tetromino Demo Video](videos/tetromino_demo.webm)
 
 Tetromino is a Tetris-like game written in Java with JavaFX made by [Jonas](https://github.com/john-luck-pickerd) and myself during our 2nd semester @ HdM Stuttgart.
